@@ -15,7 +15,8 @@ app = Flask(__name__)
 @app.route('/')
 def mainpage():
     userid = session.get('userid', None)
-    return render_template('main.html', userid=userid)
+    products = Product.query.all()
+    return render_template('main.html', userid=userid, products=products)
 
 @app.route('/selling', methods=['GET', 'POST'])
 def selling():

@@ -32,5 +32,15 @@
             {%endif%}
         </div>
     </div>
+    {%if products%}
+    <div class = "products">
+        {% for product in products %}
+            <div class = "product">
+                <img src="../static/src/img/{{product.id | string + product.picture}}">
+                <p>{{ product.title }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    {%endif%}
 </body>
 </html>
