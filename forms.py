@@ -1,10 +1,18 @@
 from flask import flash
 from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms import PasswordField
+from wtforms import StringField, PasswordField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from werkzeug.security import check_password_hash
 from models import User  # Models.py 가져옴
+
+class SellingForm(FlaskForm):
+    title = StringField('title', validators=[DataRequired()])
+    keyword = StringField('keyword', validators=[DataRequired()])
+    price = IntegerField('price', validators=[DataRequired()])
+    contact = StringField('contact', validators=[DataRequired()])
+    picture = FileField(validators=[FileRequired(), FileAllowed(['jpg', 'png'], '이미지만 업로드 가능합니다')])
+    detail = TextAreaField('detail', validators=[DataRequired()])
 
 
 class RegisterForm(FlaskForm):
