@@ -19,11 +19,9 @@
             <form method="POST">
                 {{form.csrf_token}}
                 <div class="form-group">
-                    {{form.userid.label("아이디")}}
-                    {{form.userid(class="form-control", placeholder="아이디")}}
+                    {{form.userid(class="form-control", placeholder="ID")}}
                 </div>
                 <div class="form-group">
-                    {{form.password.label("비밀번호")}}
                     {%with messages = get_flashed_messages()%} <!--로그인이 실패하면-->
                     {%if messages %}
                     <script type="text/javascript">
@@ -31,7 +29,7 @@
                     </script> <!--첫번째 에러메시지 출력한다-->
                     {%endif%} <!--실패하지 않았으면 비밀번호 넘긴다-->
                     {%endwith%}
-                    {{form.password(class="form-control", placeholder="비밀번호")}}
+                    {{form.password(class="form-control", placeholder="PASSWORD")}}
                 </div>
                 <button type="submit" class="btn btn-primary">제출</button>
             </form>
