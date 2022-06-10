@@ -49,13 +49,12 @@ def login():
         user = User.query.filter_by(userid=form.data.get('userid')).first()
         if not user:
             error = '존재하지 않는 사용자입니다.'
-        elif not check_password_hash(user.password, form.data.get('password')):
+        elif not user.check_password(form.data.get('password')):
             error = '비밀번호가 올바르지 않습니다.'
         if error is None:
             print('{}가 로그인 했습니다'.format(form.data.get('userid')))
             session.clear()
-            session['userid'] = form.data.get(
-                'userid')  # form에서 가져온 userid를 세션에 저장
+            session['userid'] = form.data.get('userid')  # form에서 가져온 userid를 세션에 저장
             return redirect('/')  # 성공하면 main.html로
         flash(error)
     return render_template('login.html', form=form)
