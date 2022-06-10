@@ -9,9 +9,7 @@ from models import User  # Models.py 가져옴
 
 class RegisterForm(FlaskForm):
     userid = StringField('userid', validators=[DataRequired()])
-    email = StringField('email', validators=[DataRequired()])
-    password = PasswordField('password', validators=[
-                             DataRequired(), EqualTo('password_2')])  # 비밀번호 확인
+    password = PasswordField('password', validators=[DataRequired(), EqualTo('password_2')])  # 비밀번호 확인
     password_2 = PasswordField('password_2', validators=[DataRequired()])
 
 
@@ -33,5 +31,4 @@ class LoginForm(FlaskForm):
             flash(error)
 
     userid = StringField('userid', validators=[DataRequired()])
-    password = PasswordField('password', validators=[
-                             DataRequired(), UserPassword()])
+    password = PasswordField('password', validators=[DataRequired(), UserPassword()])
