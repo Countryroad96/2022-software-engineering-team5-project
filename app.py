@@ -2,14 +2,13 @@ import os  # 디렉토리 절대 경로
 from flask import Flask, flash
 from flask import render_template  # template폴더 안에 파일을 쓰겠다
 from flask import request  # 회원정보를 제출할 때 쓰는 request, post요청 처리
-from flask import redirect  # 리다이렉트
-#from flask_sqlalchemy import SQLAlchemy
+from flask import redirect # 리다이렉트
 from models import db
-from models import User
+from models import User, Product
 from flask import session  # 세션
 from flask_wtf.csrf import CSRFProtect  # csrf
-from forms import RegisterForm, LoginForm
-from werkzeug.security import check_password_hash
+from forms import RegisterForm, LoginForm, SellingForm
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 
@@ -18,9 +17,44 @@ def mainpage():
     userid = session.get('userid', None)
     return render_template('main.html', userid=userid)
 
+@app.route('/selling', methods=['GET', 'POST'])
+def selling():
+    userid = session.get('userid', None)
+    if userid == None:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    form = SellingForm()
+    if form.validate_on_submit():
+        filename = secure_filename(form.picture.data.filename)
+        
+        product_table = Product(session.get('userid', None),
+                                form.data.get('title'),
+                                form.data.get('keyword'),
+                                form.data.get('price'),
+                                form.data.get('contact'),
+                                filename,
+                                form.data.get('detail'))
+        db.session.add(product_table)
+        db.session.commit()
+        
+        form.picture.data.save('static/src/img/'+ str(product_table.id) + filename)
+        
+        message = '판매글이 저장되었습니다'
+        flash(message)
+        return redirect('/')
+    return render_template('selling.html', form=form)
 
-# GET(정보보기), POST(정보수정) 메서드 허용
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/product/<product_id>')
+def product(product_id):
+    product = Product.query.filter_by(id = product_id).first()
+    return render_template('product.html', product=product)
+
+@app.route('/mypage')
+def mypage():
+    return render_template('mypage.html')
+
 @app.route('/register', methods=['GET', 'POST'])    # GET(정보보기), POST(정보수정) 메서드 허용
 def register():
     form = RegisterForm()
