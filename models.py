@@ -30,3 +30,37 @@ class User(db.Model):  # 데이터 모델을 나타내는 객체 선언
     
     def get_following(self):
         return self.following_list.split()
+
+
+class Product(db.Model):
+    __tablename__ = 'product_table'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.String(32), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    keyword = db.Column(db.String(400), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    contact = db.Column(db.String(100), nullable=False)
+    picture = db.Column(db.String(100), nullable=False)
+    detail = db.Column(db.String(1000), nullable=False)
+    purchased = db.Column(db.Boolean, nullable=False)
+    
+    def __init__(self, userid, title, keyword, price, contact, picture, detail, **kwargs):
+        self.userid = userid
+        self.title = title
+        self.keyword = keyword
+        self.price = price
+        self.contact = contact
+        self.picture = picture
+        self.detail = detail
+        self.purchased = False
+        
+    def set_purchased(self, purchased):
+        self.purchased = purchased
+    
+    
+def list_to_string(str_list):
+    result = ""
+    for s in str_list:
+        result += s + " "
+    return result.strip()
