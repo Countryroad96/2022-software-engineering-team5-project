@@ -9,6 +9,27 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     </head>
 <body>
+    <!--네비게이션 바-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">🛒팀5마켓</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/selling">판매하기 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/buy">구매하기</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mypage">마이페이지</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
     {%with messages = get_flashed_messages()%}
     {%if messages %}
     <script type="text/javascript">
@@ -18,9 +39,9 @@
     {%endwith%}
     <div class = "container">
         <div class="row mt-5">
-            <h1>이곳은 구매 페이지</h1>
+            <h5>키워드를 입력하세요</h5>
             {%if keyword%}
-            {{keyword}}
+            <p style="color: green;">&emsp;키워드 | {{keyword}}</p>
             {%endif%}
         </div>
         <br>
@@ -30,22 +51,22 @@
         </form>
         <br>
         {%if products%}
-        <div class = "products">
+        <div class = "card-columns">
             {% for product in products %}
-                <div class = "product">
-                    <a href="/product/{{product.id}}">
-                        <img src="../static/src/img/{{product.id | string + product.picture}}">
-                    </a>
-                    <a href="/product/{{product.id}}">
-                        <p>
-                            {{ product.title }}<br>
-                            {{ product.price }}원
-                            {%if product.purchased%}
-                                <span style="color: black;">판매완료</span>
-                            {%endif%}
-                        </p>
-                    </a>
-                </div>
+            <div class = "card" style="width: 18rem;">
+                <a href="/product/{{product.id}}">
+                    <img src="../static/src/img/{{product.id | string + product.picture}}"class="card-img-top" alt="...">
+                </a>
+                <a href="/product/{{product.id}}">
+                    <p>
+                        <h5>{{ product.title }}</h5>
+                        {{ product.price }}원
+                        {%if product.purchased%}
+                            <span style="color: black;">판매완료</span>
+                        {%endif%}
+                    </p>
+                </a>
+            </div>
             {% endfor %}
         </div>
         {%endif%}

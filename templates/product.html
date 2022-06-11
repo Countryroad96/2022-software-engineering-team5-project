@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+    
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +12,26 @@
     <title>Document</title>
 </head>
 <body>
+    <!--네비게이션 바-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">🛒팀5마켓</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/selling">판매하기 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/buy">구매하기</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mypage">마이페이지</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
     {%with messages = get_flashed_messages()%}
     {%if messages %}
     <script type="text/javascript">
@@ -18,59 +39,64 @@
     </script>
     {%endif%}
     {%endwith%}
-    <div class = "product">
-        <img src="../static/src/img/{{product.id | string + product.picture}}">
-        <div class="sellerInfo">
-            판매자 | {{ product.userid }}
-            {%if userid and not userid == product.userid %}
-                {%if following_list == None or not product.userid in following_list%}
-                <form method="post" action="/follow">.
-                    {{form.csrf_token}}
-                    <input name="value" value="{{product.userid}}" style="display: none;">
-                    <input name="product_id" value="{{product.id}}" style="display: none;">
-                    <input type="submit" id="follow" class="btn btn-primary" value="팔로우">
-                </form>
-                {%else%}
-                <form method="post" action="/unfollow">.
-                    {{form.csrf_token}}
-                    <input name="value" value="{{product.userid}}" style="display: none;">
-                    <input name="product_id" value="{{product.id}}" style="display: none;">
-                    <input type="submit" id="follow" class="btn btn-secondary" value="언팔로우">
-                </form>
-                {%endif%}
+    <div class = "ml-5 mb-3 media">
+        <img src="../static/src/img/{{product.id | string + product.picture}}" class="align-self-center mr-3" alt="..." width="300" height="300">
+        
+        <div class="media-body">
+            <br>
+            <h2 class="mt-1 ml-3" style="font-weight:bold;">{{ product.title }}</h2>
+            <h3 class="mt-1 ml-3" style="color:gray;">{{ product.price }}원</h3>
+            <p class="mt-0 ml-3" style="color:green;">
+                {{ product.contact }}<br>
+                <div  class="mt-3 ml-3" style="white-space: pre;">{{product.detail}}</div><br>
+            </p>
+            <p class="mt-3 ml-3" style="color:green;">
+                #{{ product.keyword1 }} #{{ product.keyword2 }} #{{ product.keyword3 }} #{{ product.keyword4 }} #{{ product.keyword5 }}<br>
+            </p>
+        </div>        
+    </div>
+    <div class="sellerInfo">
+        &emsp;&emsp;&emsp;판매자 | {{ product.userid }}
+        {%if userid and not userid == product.userid %}
+            {%if following_list == None or not product.userid in following_list%}
+            <form method="post" action="/follow">
+                {{form.csrf_token}}
+                <input name="value" value="{{product.userid}}" style="display: none;">
+                <input name="product_id" value="{{product.id}}" style="display: none;">
+                <input type="submit" id="follow" class="btn btn-primary btn-sm ml-5" value="팔로우">
+            </form>
+            {%else%}
+            <form method="post" action="/unfollow">
+                {{form.csrf_token}}
+                <input name="value" value="{{product.userid}}" style="display: none;">
+                <input name="product_id" value="{{product.id}}" style="display: none;">
+                <input type="submit" id="follow" class="btn btn-secondary btn-sm ml-5" value="언팔로우">
+            </form>
             {%endif%}
-        </div>
-        <p>
-            {{ product.title }}<br>
-            {{ product.price }}원<br>
-            {{ product.contact }}<br>
-            <div style="white-space: pre;">{{product.detail}}</div><br>
-            {{ product.keyword1 }} {{ product.keyword2 }} {{ product.keyword3 }} {{ product.keyword4 }} {{ product.keyword5 }}<br>
-            
-        </p>
-        <a href="/">홈으로</a>
-        <div>
-            {%if userid == product.userid%}
-                {%if not product.purchased%}
-                    <button class="btn btn-danger" onclick="location.href='/delete/{{product.id}}'">삭제</button>
-                    <button class="btn btn-secondary" onclick="location.href='/update/{{product.id}}'">수정</button>
-                    
+        {%endif%}
+    </div>
+    <div>
+        {%if userid == product.userid%}
+            {%if not product.purchased%}
+                <button class="mr-5 btn btn-danger float-right" style="text-align:center; !important" onclick="location.href='/delete/{{product.id}}'">삭제</button>
+                <button class="mr-1 btn btn-secondary float-right" style="text-align:center !important;" onclick="location.href='/update/{{product.id}}'">수정</button>
+                
+                <form method="post" action="/setpurchased">
+                    {{form.csrf_token}}
+                    <input name="product_id" value="{{product.id}}" style="display: none;">
+                    <input type="submit" class="mr-1 btn btn-success float-right" value="판매완료">
+                </form>
+            {%else%}
+                <div class="m-5 purchased float-right">
                     <form method="post" action="/setpurchased">
                         {{form.csrf_token}}
                         <input name="product_id" value="{{product.id}}" style="display: none;">
-                        <input type="submit" class="btn btn-success" value="판매완료">
+                        <input type="submit" class="btn btn-secondary" value="판매완료된 상품입니다">
                     </form>
-                {%else%}
-                    <div class="purchased">
-                        <form method="post" action="/setpurchased">
-                            {{form.csrf_token}}
-                            <input name="product_id" value="{{product.id}}" style="display: none;">
-                            <input type="submit" class="btn btn-secondary" value="판매완료된 상품입니다">
-                        </form>
-                    </div>
-                {%endif%}
+                </div>
             {%endif%}
-        </div>
+        {%endif%}
     </div>
+        
 </body>
 </html>

@@ -9,6 +9,27 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     </head>
 <body>
+    <!--네비게이션 바-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="">🛒팀5마켓</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/selling">판매하기</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/buy">구매하기</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mypage">마이페이지</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
     {%with messages = get_flashed_messages()%}
     {%if messages %}
     <script type="text/javascript">
@@ -17,33 +38,27 @@
     {%endif%}
     {%endwith%}
     <div class = "container">
-        <div class="row mt-5">
-            <h1>이곳은 메인 페이지</h1>
-        </div>
         <br>
         <div class=form-group>
+            <h1>다양한 상품을 만나보세요</h1>
             {%if userid%}
-            {{userid}}<a>님 안녕하세요!</a><br>
-            <a href="/logout">로그아웃</a>
-            <a href="/selling">판매하기</a>
-            <a href="/buy">구매하기</a>
-            <a href="/mypage">마이페이지</a>
+            <br>
+            <h4>{{userid}}님 안녕하세요!</h4><br>
             {%else%}
-            <a href="/login">로그인</a>
-            <a href="/register">회원가입</a>
+            <br>
             {%endif%}
         </div>
-    </div>
-    {%if products%}
-    <div class = "products">
-        {% for product in products %}
-            <div class = "product">
+    
+        {%if products%}
+        <div class = "card-columns ml-5">
+            {% for product in products %}
+            <div class = "card" style="width: 18rem;">
                 <a href="/product/{{product.id}}">
-                    <img src="../static/src/img/{{product.id | string + product.picture}}">
+                    <img src="../static/src/img/{{product.id | string + product.picture}}"class="card-img-top" alt="...">
                 </a>
                 <a href="/product/{{product.id}}">
                     <p>
-                        {{ product.title }}<br>
+                        <h5>{{ product.title }}</h5>
                         {{ product.price }}원
                         {%if product.purchased%}
                             <span style="color: black;">판매완료</span>
@@ -51,8 +66,9 @@
                     </p>
                 </a>
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+        {%endif%}
     </div>
-    {%endif%}
 </body>
 </html>
