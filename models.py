@@ -54,17 +54,25 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     userid = db.Column(db.String(32), nullable=False)
     title = db.Column(db.String(100), nullable=False)
-    keyword = db.Column(db.String(400), nullable=False)
+    keyword1 = db.Column(db.String(40), nullable=False)
+    keyword2 = db.Column(db.String(40))
+    keyword3 = db.Column(db.String(40))
+    keyword4 = db.Column(db.String(40))
+    keyword5 = db.Column(db.String(40))
     price = db.Column(db.Integer, nullable=False)
     contact = db.Column(db.String(100), nullable=False)
     picture = db.Column(db.String(100), nullable=False)
     detail = db.Column(db.String(1000), nullable=False)
     purchased = db.Column(db.Boolean, nullable=False)
     
-    def __init__(self, userid, title, keyword, price, contact, picture, detail, **kwargs):
+    def __init__(self, userid, title, keyword1, keyword2, keyword3, keyword4, keyword5, price, contact, picture, detail, **kwargs):
         self.userid = userid
         self.title = title
-        self.keyword = keyword
+        self.keyword1 = keyword1
+        self.keyword2 = keyword2
+        self.keyword3 = keyword3
+        self.keyword4 = keyword4
+        self.keyword5 = keyword5
         self.price = price
         self.contact = contact
         self.picture = picture

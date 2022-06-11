@@ -1,3 +1,4 @@
+from tokenize import String
 from flask import flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, IntegerField, TextAreaField
@@ -8,7 +9,11 @@ from models import User  # Models.py 가져옴
 
 class SellingForm(FlaskForm):
     title = StringField('title', validators=[DataRequired()])
-    keyword = StringField('keyword', validators=[DataRequired()])
+    keyword1 = StringField('keyword1', validators=[DataRequired()])
+    keyword2 = StringField('keyword2')
+    keyword3 = StringField('keyword3')
+    keyword4 = StringField('keyword4')
+    keyword5 = StringField('keyword5')
     price = IntegerField('price', validators=[DataRequired()])
     contact = StringField('contact', validators=[DataRequired()])
     picture = FileField(validators=[FileRequired(), FileAllowed(['jpg', 'png'], '이미지만 업로드 가능합니다')])
@@ -19,6 +24,10 @@ class RegisterForm(FlaskForm):
     userid = StringField('userid', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired(), EqualTo('password_2')])  # 비밀번호 확인
     password_2 = PasswordField('password_2', validators=[DataRequired()])
+    
+    
+class SearchForm(FlaskForm):
+    keyword = StringField('keyword')
 
 
 class LoginForm(FlaskForm):

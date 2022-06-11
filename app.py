@@ -1,8 +1,10 @@
+from operator import itemgetter
 import os  # 디렉토리 절대 경로
 from flask import Flask, flash
 from flask import render_template  # template폴더 안에 파일을 쓰겠다
 from flask import request  # 회원정보를 제출할 때 쓰는 request, post요청 처리
-from flask import redirect # 리다이렉트
+from flask import redirect
+from sqlalchemy import null # 리다이렉트
 from models import db
 from models import User, Product
 from flask import session  # 세션
@@ -35,7 +37,11 @@ def selling():
         
         product_table = Product(session.get('userid', None),
                                 form.data.get('title'),
-                                form.data.get('keyword'),
+                                form.data.get('keyword1'),
+                                form.data.get('keyword2'),
+                                form.data.get('keyword3'),
+                                form.data.get('keyword4'),
+                                form.data.get('keyword5'),
                                 form.data.get('price'),
                                 form.data.get('contact'),
                                 filename,
@@ -179,6 +185,42 @@ def followingList():
     following_ids = temp.get_following()
     
     return render_template('followingList.html', following_ids=following_ids)
+
+@app.route('/buy')
+def buy():
+    if request.args:
+        value = request.args.to_dict()['value']
+        print(value)
+        if value=="":
+            products = Product.query.all()
+            return render_template('buy.html', products=products)
+        temp = Product.query.filter_by(keyword1=value).order_by(Product.id).all()
+        print(temp)
+        temp.extend(Product.query.filter_by(keyword2=value).order_by(Product.id).all())
+        temp.extend(Product.query.filter_by(keyword3=value).order_by(Product.id).all())
+        temp.extend(Product.query.filter_by(keyword4=value).order_by(Product.id).all())
+        temp.extend(Product.query.filter_by(keyword5=value).order_by(Product.id).all())
+        print(temp)
+        temp2 = set(temp)
+        products = list(temp2)
+        print(products)
+        #print(products.sort(key=itemgetter(id)))
+        
+        for i in range(len(products) - 1):
+            minindex = i
+            for j in range(i + 1, len(products)):
+                if products[j].id < products[minindex].id:
+                    minindex = j
+            products[i], products[minindex] = products[minindex], products[i]
+                
+        print(products)
+        
+        
+        
+        return render_template('buy.html', keyword=value, products=products)
+    else:
+        products = Product.query.all()
+    return render_template('buy.html', products=products)
 
 @app.route('/register', methods=['GET', 'POST'])    # GET(정보보기), POST(정보수정) 메서드 허용
 def register():
