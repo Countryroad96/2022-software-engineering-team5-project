@@ -163,7 +163,7 @@ def mypage():
 @app.route('/sellinglist/<targetid>')
 def sellingList(targetid):
     products = Product.query.filter_by(userid=targetid).all()
-    return render_template('sellingList.html', products=products)
+    return render_template('sellingList.html', products=products, targetid=targetid)
 
 @app.route('/followinglist')
 def followingList():

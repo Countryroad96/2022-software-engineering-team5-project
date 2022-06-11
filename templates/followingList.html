@@ -9,16 +9,27 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     </head>
 <body>
+    {%with messages = get_flashed_messages()%}
+    {%if messages %}
+    <script type="text/javascript">
+        alert("{{messages[-1]}}");
+    </script>
+    {%endif%}
+    {%endwith%}
     <div class = "container">
         <div class="row mt-5">
             <h1>이곳은 Following List</h1>
         </div>
         <br>
         <div class=form-group>
-            <p>{{userid}}</p>
-            <a href="/sellinglist/{{userid}}">판매내역</a>
-            <a href="/following">Following</a><br>
-            <a href="/">메인페이지</a>
+            {%if following_ids%}
+                {%for following_id in following_ids%}
+                <span>{{following_id}}</span> / 
+                <button class="btn btn-success" onclick="location.href='/sellinglist/{{following_id}}'">판매글 보러가기</button><br>
+                {%endfor%}
+            {%else%}
+                <p>팔로잉이 없습니다.</p>
+            {%endif%}
         </div>
     </div>
 </body>
