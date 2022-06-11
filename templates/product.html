@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<body>
+    {%with messages = get_flashed_messages()%}
+    {%if messages %}
+    <script type="text/javascript">
+        alert("{{messages[-1]}}");
+    </script>
+    {%endif%}
+    {%endwith%}
+    <div class = "product">
+        <img src="../static/src/img/{{product.id | string + product.picture}}">
+        <div class="sellerInfo">
+            판매자 | {{ product.userid }}
+            {%if userid and not userid == product.userid %}
+                {%if following_list == None or not product.userid in following_list%}
+                <form method="post" action="/follow">.
+                    {{form.csrf_token}}
+                    <input name="value" value="{{product.userid}}" style="display: none;">
+                    <input name="product_id" value="{{product.id}}" style="display: none;">
+                    <input type="submit" id="follow" class="btn btn-primary" value="팔로우">
+                </form>
+                {%else%}
+                <form method="post" action="/unfollow">.
+                    {{form.csrf_token}}
+                    <input name="value" value="{{product.userid}}" style="display: none;">
+                    <input name="product_id" value="{{product.id}}" style="display: none;">
+                    <input type="submit" id="follow" class="btn btn-secondary" value="언팔로우">
+                </form>
+                {%endif%}
+            {%endif%}
+        </div>
+        <p>
+            {{ product.title }}<br>
+            {{ product.price }}원<br>
+            {{ product.contact }}<br>
+            <p>
+                {{ product.detail }}
+            </p>
+            {{ product.keyword }}<br>
+            
+        </p>
+        <a href="/">홈으로</a>
+        <div>
+            {%if userid == product.userid%}
+                {%if not product.purchased%}
+                    <button class="btn btn-danger" onclick="location.href='/delete/{{product.id}}'">삭제</button>
+                    <button class="btn btn-secondary" onclick="location.href='/update/{{product.id}}'">수정</button>
+                    
+                    <form method="post" action="/setpurchased">
+                        {{form.csrf_token}}
+                        <input name="product_id" value="{{product.id}}" style="display: none;">
+                        <input type="submit" class="btn btn-success" value="판매완료">
+                    </form>
+                {%else%}
+                    <div class="purchased">
+                        <form method="post" action="/setpurchased">
+                            {{form.csrf_token}}
+                            <input name="product_id" value="{{product.id}}" style="display: none;">
+                            <input type="submit" class="btn btn-secondary" value="판매완료된 상품입니다">
+                        </form>
+                    </div>
+                {%endif%}
+            {%endif%}
+        </div>
+    </div>
+</body>
+</html>

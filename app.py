@@ -9,7 +9,10 @@ from flask import session  # 세션
 from flask_wtf.csrf import CSRFProtect  # csrf
 from forms import RegisterForm, LoginForm, SellingForm
 from werkzeug.utils import secure_filename
+from PIL import Image
 app = Flask(__name__)
+
+default_file_path = 'static/src/img/'
 
 
 @app.route('/')
@@ -20,13 +23,13 @@ def mainpage():
 
 @app.route('/selling', methods=['GET', 'POST'])
 def selling():
+    form = SellingForm()
     userid = session.get('userid', None)
-    if userid == None:
+    if not userid:
         message = '로그인 후 이용 가능합니다'
         flash(message)
         return redirect('/')
     
-    form = SellingForm()
     if form.validate_on_submit():
         filename = secure_filename(form.picture.data.filename)
         
@@ -40,21 +43,142 @@ def selling():
         db.session.add(product_table)
         db.session.commit()
         
-        form.picture.data.save('static/src/img/'+ str(product_table.id) + filename)
+        form.picture.data.save(default_file_path + str(product_table.id) + filename)
         
         message = '판매글이 저장되었습니다'
         flash(message)
         return redirect('/')
     return render_template('selling.html', form=form)
 
-@app.route('/product/<product_id>')
+@app.route('/update/<product_id>', methods=['GET', 'POST'])
+def update(product_id):
+    form = SellingForm()
+    userid = session.get('userid', None)
+    
+    if product_id:
+        product = Product.query.get(product_id)
+        if not product:
+            return redirect('/')
+    else:
+        return redirect('/')
+    
+    if not userid:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    elif not userid == product.userid:
+        message = '작성자만 수정이 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    form.title.data = product.title
+    form.keyword.data = product.keyword
+    form.price.data = product.price
+    form.contact.data = product.contact
+    #form.picture.data = Image.open(default_file_path + product_id + product.picture)
+    form.detail.data = product.detail
+    #print(default_file_path + product_id + product.picture)
+    #print(Image.open(default_file_path + product_id + product.picture))
+    
+    if form.validate_on_submit():
+        filename = secure_filename(form.picture.data.filename)
+        
+        product.title = form.data.get('title')
+        product.keyword = form.data.get('keyword')
+        product.price = form.data.get('price')
+        product.contact = form.data.get('contact')
+        product.picture = filename
+        product.detail = form.data.get('detail')
+        db.session.commit()
+        
+        form.picture.data.save(default_file_path + str(product.id) + filename)
+        
+        message = '판매글이 저장되었습니다'
+        flash(message)
+        return redirect('/')
+    
+    return render_template('update.html', form=form, product=product)\
+
+@app.route('/delete/<product_id>')
+def delete(product_id):
+    userid = session.get('userid', None)
+    
+    if product_id:
+        product = Product.query.get(product_id)
+        if not product:
+            return redirect('/')
+    else:
+        return redirect('/')
+    
+    if not userid:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    elif not userid == product.userid:
+        message = '작성자만 삭제가 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    db.session.delete(product)
+    db.session.commit()
+    
+    message = '삭제가 완료되었습니다'
+    flash(message)
+    return redirect('/')
+
+@app.route('/product/<product_id>', methods=['GET', 'POST'])
 def product(product_id):
-    product = Product.query.filter_by(id = product_id).first()
-    return render_template('product.html', product=product)
+    form = RegisterForm()
+    userid = session.get('userid', None)
+    following_list = None
+    
+    if userid:
+        following_list = User.query.filter_by(userid=userid).first().get_following()
+
+    product = Product.query.get(product_id)
+    return render_template('product.html', product=product, userid=userid, following_list=following_list, form=form)
+
+@app.route('/setpurchased', methods=['POST'])
+def setpurchased():
+    product_id = request.form['product_id']
+    temp = Product.query.get(product_id)
+    
+    if not temp:
+        message = '잘못된 접근입니다'
+        flash(message)
+        return redirect('/')
+    
+    temp.set_purchased()
+    message = '판매완료 변경이 완료되었습니다'
+    flash(message)
+    
+    return redirect('/product/'+request.form['product_id'])
+
 
 @app.route('/mypage')
 def mypage():
-    return render_template('mypage.html')
+    userid = session.get('userid', None)
+    return render_template('mypage.html', userid=userid)
+
+@app.route('/sellinglist/<targetid>')
+def sellingList(targetid):
+    products = Product.query.filter_by(userid=targetid).all()
+    return render_template('sellingList.html', products=products)
+
+@app.route('/followinglist')
+def followingList():
+    userid = session.get('userid', None)
+    
+    if not userid:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    temp = User.query.filter_by(userid=userid).first()
+    
+    following_ids = temp.get_following()
+    
+    return render_template('followingList.html', following_ids=following_ids)
 
 @app.route('/register', methods=['GET', 'POST'])    # GET(정보보기), POST(정보수정) 메서드 허용
 def register():
@@ -74,7 +198,6 @@ def register():
             flash(message)
             return redirect('/')
     return render_template('register.html', form=form)  # form이 어떤 form인지 명시한다
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -99,6 +222,50 @@ def login():
 def logout():
     session.pop('userid', None)
     return redirect('/')
+
+@app.route('/follow', methods=['POST'])
+def follow():
+    userid = session.get('userid', None)
+    targetid = request.form['value']
+    
+    if not userid:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    temp = User.query.filter_by(userid=userid).first()
+    
+    if not User.query.filter_by(userid=targetid).first():
+        error = '존재하지 않는 사용자입니다.'
+        flash(error)
+        return redirect('/')
+    
+    temp.add_following(targetid)
+    db.session.commit()
+    flash('팔로우 성공')
+    return redirect('/product/'+request.form['product_id'])
+
+@app.route('/unfollow/', methods=['POST'])
+def unfollow():
+    userid = session.get('userid', None)
+    targetid = request.form['value']
+    
+    if not userid:
+        message = '로그인 후 이용 가능합니다'
+        flash(message)
+        return redirect('/')
+    
+    temp = User.query.filter_by(userid=userid).first()
+    
+    if not User.query.filter_by(userid=targetid).first():
+        error = '존재하지 않는 사용자입니다.'
+        flash(error)
+        return redirect('/')
+    
+    temp.remove_following(targetid)
+    db.session.commit()
+    flash('언팔로우 성공')
+    return redirect('/product/'+request.form['product_id'])
 
 
 if __name__ == "__main__":

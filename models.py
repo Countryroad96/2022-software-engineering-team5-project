@@ -26,9 +26,25 @@ class User(db.Model):  # 데이터 모델을 나타내는 객체 선언
         self.userid = userid
         
     def add_following(self, userid):
-        self.following_list = list_to_string(self.following_list.split().append(userid))
+        if not self.following_list:
+            self.following_list = userid
+            return None
+        temp = ('temp ' + self.following_list).split()
+        temp.append(userid)
+        temp.pop(0)
+        self.following_list = list_to_string(temp)
+        
+    def remove_following(self, userid):
+        if not self.following_list:
+            return None
+        temp = ('temp ' + self.following_list).split()
+        temp.remove(userid)
+        temp.pop(0)
+        self.following_list = list_to_string(temp)
     
     def get_following(self):
+        if not self.following_list:
+            return None
         return self.following_list.split()
 
 
@@ -55,12 +71,14 @@ class Product(db.Model):
         self.detail = detail
         self.purchased = False
         
-    def set_purchased(self, purchased):
-        self.purchased = purchased
+    def set_purchased(self):
+        self.purchased = not self.purchased
     
     
 def list_to_string(str_list):
     result = ""
+    if len(str_list) == 1:
+        return str_list[0].strip()
     for s in str_list:
         result += s + " "
     return result.strip()

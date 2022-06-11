@@ -18,40 +18,31 @@
     {%endwith%}
     <div class = "container">
         <div class="row mt-5">
-            <h1>이곳은 메인 페이지</h1>
+            <h1>이곳은 판매내역</h1>
         </div>
         <br>
-        <div class=form-group>
-            {%if userid%}
-            {{userid}}<a>님 안녕하세요!</a><br>
-            <a href="/logout">로그아웃</a>
-            <a href="/selling">판매하기</a>
-            <a href="/mypage">마이페이지</a>
-            {%else%}
-            <a href="/login">로그인</a>
-            <a href="/register">회원가입</a>
-            {%endif%}
+        {%if products%}
+        <div class = "products">
+            {% for product in products %}
+                <div class = "product">
+                    <a href="/product/{{product.id}}">
+                        <img src="../static/src/img/{{product.id | string + product.picture}}">
+                    </a>
+                    <a href="/product/{{product.id}}">
+                        <p>
+                            {{ product.title }}<br>
+                            {{ product.price }}원
+                            {%if product.purchased%}
+                                <span style="color: black;">판매완료</span>
+                            {%endif%}
+                        </p>
+                    </a>
+                </div>
+            {% endfor %}
         </div>
+        {%else%}
+        <p>판매내역이 없습니다.</p>
+        {%endif%}
     </div>
-    {%if products%}
-    <div class = "products">
-        {% for product in products %}
-            <div class = "product">
-                <a href="/product/{{product.id}}">
-                    <img src="../static/src/img/{{product.id | string + product.picture}}">
-                </a>
-                <a href="/product/{{product.id}}">
-                    <p>
-                        {{ product.title }}<br>
-                        {{ product.price }}원
-                        {%if product.purchased%}
-                            <span style="color: black;">판매완료</span>
-                        {%endif%}
-                    </p>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
-    {%endif%}
 </body>
 </html>
