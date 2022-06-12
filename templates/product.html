@@ -78,7 +78,7 @@
     <div>
         {%if userid == product.userid%}
             {%if not product.purchased%}
-                <button class="mr-5 btn btn-danger float-right" style="text-align:center; !important" onclick="location.href='/delete/{{product.id}}'">삭제</button>
+                <button class="mr-5 btn btn-danger float-right" style="text-align:center !important;" onclick="location.href='/delete/{{product.id}}'">삭제</button>
                 <button class="mr-1 btn btn-secondary float-right" style="text-align:center !important;" onclick="location.href='/update/{{product.id}}'">수정</button>
                 
                 <form method="post" action="/setpurchased">

@@ -1,4 +1,3 @@
-from tokenize import String
 from flask import flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, IntegerField, TextAreaField

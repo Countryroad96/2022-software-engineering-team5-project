@@ -2,16 +2,14 @@ from operator import itemgetter
 import os  # 디렉토리 절대 경로
 from flask import Flask, flash
 from flask import render_template  # template폴더 안에 파일을 쓰겠다
-from flask import request  # 회원정보를 제출할 때 쓰는 request, post요청 처리
-from flask import redirect
-from sqlalchemy import null # 리다이렉트
+from flask import request   # 회원정보를 제출할 때 쓰는 request, post요청 처리
+from flask import redirect  # 리다이렉트
 from models import db
 from models import User, Product
 from flask import session  # 세션
 from flask_wtf.csrf import CSRFProtect  # csrf
 from forms import RegisterForm, LoginForm, SellingForm
 from werkzeug.utils import secure_filename
-from PIL import Image
 app = Flask(__name__)
 
 default_file_path = 'static/src/img/'
@@ -31,7 +29,7 @@ def selling():
         message = '로그인 후 이용 가능합니다'
         flash(message)
         return redirect('/')
-    
+
     if form.validate_on_submit():
         filename = secure_filename(form.picture.data.filename)
         
@@ -67,7 +65,7 @@ def update(product_id):
             return redirect('/')
     else:
         return redirect('/')
-    
+
     if not userid:
         message = '로그인 후 이용 가능합니다'
         flash(message)
@@ -77,20 +75,26 @@ def update(product_id):
         flash(message)
         return redirect('/')
     
-    form.title.data = product.title
-    form.keyword.data = product.keyword
-    form.price.data = product.price
-    form.contact.data = product.contact
-    #form.picture.data = Image.open(default_file_path + product_id + product.picture)
-    form.detail.data = product.detail
-    #print(default_file_path + product_id + product.picture)
-    #print(Image.open(default_file_path + product_id + product.picture))
+    if request.method == 'GET':
+        form.title.data = product.title
+        form.keyword1.data = product.keyword1
+        form.keyword2.data = product.keyword2
+        form.keyword3.data = product.keyword3
+        form.keyword4.data = product.keyword4
+        form.keyword5.data = product.keyword5
+        form.price.data = product.price
+        form.contact.data = product.contact
+        form.detail.data = product.detail
     
     if form.validate_on_submit():
         filename = secure_filename(form.picture.data.filename)
         
         product.title = form.data.get('title')
-        product.keyword = form.data.get('keyword')
+        product.keyword1 = form.data.get('keyword1')
+        product.keyword2 = form.data.get('keyword2')
+        product.keyword3 = form.data.get('keyword3')
+        product.keyword4 = form.data.get('keyword4')
+        product.keyword5 = form.data.get('keyword5')
         product.price = form.data.get('price')
         product.contact = form.data.get('contact')
         product.picture = filename
@@ -103,7 +107,7 @@ def update(product_id):
         flash(message)
         return redirect('/')
     
-    return render_template('update.html', form=form, product=product)\
+    return render_template('update.html', form=form)\
 
 @app.route('/delete/<product_id>')
 def delete(product_id):
@@ -174,7 +178,7 @@ def sellingList(targetid):
 @app.route('/followinglist')
 def followingList():
     userid = session.get('userid', None)
-    
+
     if not userid:
         message = '로그인 후 이용 가능합니다'
         flash(message)
@@ -204,7 +208,6 @@ def buy():
         temp2 = set(temp)
         products = list(temp2)
         print(products)
-        #print(products.sort(key=itemgetter(id)))
         
         for i in range(len(products) - 1):
             minindex = i
@@ -214,8 +217,6 @@ def buy():
             products[i], products[minindex] = products[minindex], products[i]
                 
         print(products)
-        
-        
         
         return render_template('buy.html', keyword=value, products=products)
     else:
